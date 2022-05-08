@@ -1,7 +1,6 @@
 package main
 
 import (
-	"net/http"
 	"os"
 	"thoughts-api/src/middleware"
 	"thoughts-api/src/routes"
@@ -22,12 +21,7 @@ func main() {
 	routes.UserRoutes(router)
 
 	router.Use(middleware.Authentication())
-
-	router.GET("/", func(ctx *gin.Context) {
-
-		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": nil, "message": "successfully login"})
-
-	})
-
+	routes.ThoughtsRoutes(router)
+	routes.RepliesRoutes(router)
 	router.Run(":" + port)
 }
