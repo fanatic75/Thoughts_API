@@ -8,7 +8,7 @@ import (
 )
 
 type User struct {
-	Username   *string `json:"username" validate:"required"`
+	Username   *string `json:"username" validate:"required,min=1"`
 	Password   *string `json:"password" validate:"required,min=6"`
 	Thoughts   []Thought
 	Created_at time.Time `json:"created_at"`

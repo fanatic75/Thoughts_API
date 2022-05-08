@@ -78,6 +78,7 @@ func SignUp() gin.HandlerFunc {
 
 		password := HashPassword(*user.Password)
 		user.Password = &password
+		user.Thoughts = make([]models.Thought, 0)
 
 		user.Created_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 		user.Updated_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))

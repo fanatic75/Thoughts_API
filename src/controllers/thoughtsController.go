@@ -54,12 +54,12 @@ func ListMyThoughts() gin.HandlerFunc {
 
 		username := c.MustGet("username").(string)
 		var matchPipeline = bson.D{
-			{"$match", bson.D{{
-				"username", username,
-			}}},
+			{Key: "$match", Value: bson.M{
+				"username": username,
+			}},
 		}
 
-		var setAnonymousQuery = bson.D{{"$set", bson.M{
+		var setAnonymousQuery = bson.D{{Key: "$set", Value: bson.M{
 			"thoughts": bson.M{
 				"$map": bson.M{
 					"input": "$thoughts",
@@ -79,7 +79,7 @@ func ListMyThoughts() gin.HandlerFunc {
 													"username": bson.M{
 														"$cond": bson.M{
 															"if":   "$$reply.anonymous",
-															"then": "anonymous",
+															"then": "",
 															"else": "$$reply.username",
 														},
 													},
@@ -119,12 +119,12 @@ func ListOtherUserThoughts() gin.HandlerFunc {
 		defer cancel()
 		username := c.Param("username")
 		var matchPipeline = bson.D{
-			{"$match", bson.D{{
-				"username", username,
-			}}},
+			{Key: "$match", Value: bson.M{
+				"username": username,
+			}},
 		}
 
-		var setAnonymousQuery = bson.D{{"$set", bson.M{
+		var setAnonymousQuery = bson.D{{Key: "$set", Value: bson.M{
 			"thoughts": bson.M{
 				"$map": bson.M{
 					"input": "$thoughts",
@@ -144,7 +144,7 @@ func ListOtherUserThoughts() gin.HandlerFunc {
 													"username": bson.M{
 														"$cond": bson.M{
 															"if":   "$$reply.anonymous",
-															"then": "anonymous",
+															"then": "",
 															"else": "$$reply.username",
 														},
 													},
@@ -160,7 +160,7 @@ func ListOtherUserThoughts() gin.HandlerFunc {
 			}}}}
 
 		var filterAnonymousPipeline = bson.D{{
-			"$project", bson.M{
+			Key: "$project", Value: bson.M{
 				"thoughts": bson.M{
 					"$filter": bson.M{
 						"input": "$thoughts",
@@ -210,7 +210,7 @@ func DeleteThoughts() gin.HandlerFunc {
 		}
 		var userObject models.User
 		err = models.UserCollection.FindOneAndUpdate(ctx,
-			bson.M{"username": c.MustGet("username").(string)},
+			bson.M{"username": c.MustGet("username").(string), "thoughts._id": thoughtID},
 			bson.M{"$pull": bson.M{"thoughts": bson.M{"_id": thoughtID}}},
 			options.FindOneAndUpdate().SetReturnDocument(options.After),
 		).Decode(&userObject)

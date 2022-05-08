@@ -72,19 +72,19 @@ func DeleteReplies() gin.HandlerFunc {
 			return
 		}
 		var userObject models.User
-		err = models.UserCollection.FindOneAndUpdate(ctx,
-			bson.M{"thoughts._id": thoughtID},
-			bson.M{"$pull": bson.M{"thoughts.$.replies": bson.M{"_id": replyID, "username": c.MustGet("username").(string)}}},
+		result := models.UserCollection.FindOneAndUpdate(ctx,
+			bson.M{"thoughts._id": thoughtID, "thoughts.replies.username": c.MustGet("username").(string)},
+			bson.M{"$pull": bson.M{"thoughts.$.replies": bson.M{"_id": replyID}}},
 			options.FindOneAndUpdate().SetReturnDocument(options.After),
 			options.FindOneAndUpdate().SetProjection(bson.M{"thoughts.replies.username": 0}),
 		).Decode(&userObject)
-		if err != nil {
-			msg := fmt.Sprintf("No Such Thought")
+		if result != nil {
+			msg := fmt.Sprintf("No Such Reply")
 			c.JSON(http.StatusNotFound,
 				gin.H{"success": false, "data": nil, "message": msg})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"success": true, "data": userObject.Thoughts, "message": "Reply was deleted"})
+		c.JSON(http.StatusOK, gin.H{"success": true, "data": nil, "message": "Reply was deleted"})
 
 	}
 }
